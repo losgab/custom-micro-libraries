@@ -1,6 +1,6 @@
 #include "Button.h"
 
-button_t createButton(uint8_t pin, uint8_t is_input_pullup)
+button_t create_button(uint8_t pin, uint8_t is_input_pullup)
 {
     button_t new_button = malloc(sizeof(Button));
 

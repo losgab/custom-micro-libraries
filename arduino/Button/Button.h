@@ -1,5 +1,4 @@
-#include <Arduino.h>
-#include <stdio.h>
+// #include <Arduino.h>
 #include <stdint.h>
 /*
     Buttons for Arduino
@@ -43,4 +42,4 @@ uint8_t was_pushed(button_t button);
     Returns 1 if button is held down, else 0
     Dependent on debounce time
 */
-uint64_t is_pressed(button_t button);
+uint8_t is_pressed(button_t button);
