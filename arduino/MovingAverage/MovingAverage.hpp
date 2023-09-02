@@ -1,4 +1,12 @@
 #include <Arduino.h>
+/*
+    Moving Average for Arduino (OOP)
+
+    Convenience library for a moving average data denoiser.
+	Implements a basic circular queue.
+
+    Written by Gabriel Thien 2023
+*/
 
 #define WINDOW_SIZE 30
 

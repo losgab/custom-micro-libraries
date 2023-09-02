@@ -1,5 +1,13 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+/*
+    Wrapper Library for OLED Display SSD1306 for Arduino (OOP)
+
+    Convenience library for printing, clearing & replacing lines easily.
+
+    Written by Gabriel Thien 2023
+*/
+
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
