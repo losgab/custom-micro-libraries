@@ -7,3 +7,11 @@ Gabriel's collection of useful libraries implementing convenient functions for p
 - Arduino
 - ESP32
 
+### Arduino
+- Button
+- MovingAverage
+- SSD1306_wrapper (OLED Display)
+
+
+### ESP32
+- Button
