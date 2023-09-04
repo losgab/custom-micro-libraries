@@ -9,6 +9,7 @@
 
     Written by Gabriel Thien 2023
 */
+#include <stdlib.h>
 
 #define WINDOW_SIZE 30 // TO BE REMOVED LATER
 
