@@ -1,4 +1,3 @@
-#include <driver/gpio.h>
 /*
     Buttons for ESP32
 
@@ -8,6 +7,7 @@
 
     Written by Gabriel Thien 2023
 */
+#include <driver/gpio.h>
 
 typedef struct Button
 {
