@@ -25,6 +25,7 @@ private:
     uint8_t _pin;
     uint8_t last_state;
     uint8_t pushed;
+    uint8_t pressed;
 };
 
 #endif
