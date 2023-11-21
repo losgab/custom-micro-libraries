@@ -2,6 +2,16 @@
 
 Button::Button(uint8_t pin, uint8_t is_input_pullup, uint8_t is_analog_input)
 {
+    init(pin, is_input_pullup, is_analog_input);
+}
+
+Button::Button(uint8_t pin, uint8_t is_input_pullup)
+{
+    init(pin, is_input_pullup, false);
+}
+
+void Button::init(uint8_t pin, uint8_t is_input_pullup, uint8_t is_analog_input)
+{
     _pin = pin;
     last_state = 0;
     pushed = 0;
@@ -35,4 +45,17 @@ uint8_t Button::was_pushed()
 uint8_t Button::is_pressed()
 {
     return pressed;
+}
+
+uint8_t Button::wait_for_push()
+{
+    while (1)
+    {
+        update_button();
+        delay(UPDATE_DELAY);
+        if (pushed)
+        {
+            return 1;
+        }
+    }
 }

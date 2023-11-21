@@ -15,16 +15,20 @@
 #include <stdint.h>
 
 #define ANALOG_THRESHOLD 100
+#define UPDATE_DELAY 10
 
 class Button
 {
 public:
     Button(uint8_t pin, uint8_t is_input_pullup, uint8_t is_analog_input);
+    Button(uint8_t pin, uint8_t is_input_pullup);
     /* NOTE: A6 and A7 pins on most Arduino boards 
                 do not have internal pullups */
+    void init(uint8_t pin, uint8_t is_input_pullup, uint8_t is_analog_input);
     void update_button();
     uint8_t was_pushed();
     uint8_t is_pressed();
+    uint8_t wait_for_push();
 
 private:
     uint8_t _pin;
