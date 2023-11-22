@@ -15,3 +15,4 @@ Gabriel's collection of useful libraries implementing convenient functions for p
 
 ### ESP32
 - Button
+- MovingAverage
