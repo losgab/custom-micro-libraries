@@ -12,14 +12,7 @@ enum colour // Colours
     MAGENTA, // 255, 0, 255
 };
 
-uint8_t palette[][3] = {
-    {255, 0, 0},
-    {0, 255, 0},
-    {0, 0, 255},
-    {255, 255, 0},
-    {0, 255, 255},
-    {255, 0, 255},
-};
+extern const uint8_t palette[6][3];
 
 /**
  * @brief Convenience function for setting colour of the LED strip
