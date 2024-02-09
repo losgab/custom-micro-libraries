@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "ssd1306_wrapper.h": "c",
-        "stdio.h": "c",
-        "stdint.h": "c"
-    },
-    "C_Cpp.default.compilerPath": "C:\\msys64\\mingw64\\bin\\gcc.exe"
-}
