@@ -8,8 +8,13 @@
 #include <esp_err.h>
 #include <driver/rmt_types.h>
 #include <driver/rmt_tx.h>
+#include <stdint.h>
 
 #include "gled_strip.h"
+
+#define LED_STRIP_RMT_DEFAULT_RESOLUTION 10000000 // 10MHz resolution
+#define LED_STRIP_RMT_DEFAULT_TRANS_QUEUE_SIZE 4
+#define RMT_TAG "RMT_CTRL"
 
 /**
  * @brief LED Strip RMT configuration
@@ -24,26 +29,66 @@ typedef struct
 } gled_strip_rmt_config_t;
 
 /**
- * @brief LED Strip RMT Control
+ * @brief LED Strip RMT control
  */
 typedef struct
 {
-    rmt_encoder_handle_t strip_encoder;
-    uint8_t bytes_per_pixel;
-    uint8_t pixel_buf[];
-} gled_strip_rmt_obj;
+    rmt_encoder_handle_t strip_encoder; // RMT Encoder Handle
+    uint32_t resolution;                // RMT Encoder resolution, in Hz
+    uint8_t bytes_per_pixel;            // Bytes per pixel
+    uint8_t pixel_buffer[];             // Pixel buffer to store pixel values
+} gled_strip_rmt_ctrl;
 
 /**
- * TO BE COMPLETED!!!!!!!!!!!
-*/
-
+ * @brief Initialize RMT device with encoder, pixel control and RMT transmission
+ * (ESP-IDF Remote Control)
+ *
+ * @param strip LED Strip handle
+ *
+ * @return esp_err_t ESP_OK on success
+ */
 static esp_err_t gled_strip_new_rmt_device(gled_strip_t *strip);
 
-static esp_err_t gled_strip_rmt_set_pixel(led_strip_t *strip, uint16_t index, colour_t colour)
+/**
+ * @brief Set pixel colour of the LED strip. Does not refresh.
+ * (ESP-IDF Remote Control)
+ *
+ * @param strip LED Strip handle
+ * @param index Pixel index
+ * @param colour Colour from enumeration
+ *
+ * @return esp_err_t ESP_OK on success
+ */
+static esp_err_t gled_strip_rmt_set_pixel(gled_strip_t *strip, uint16_t index, colour_t colour);
 
-static esp_err_t gled_strip_rmt_set_colour(led_strip_t *strip, colour_t colour)
+/**
+ * @brief Sets colour of the entire LED strip. Refreshes immediately.
+ * (ESP-IDF Remote Control)
+ *
+ * @param strip LED Strip handle
+ * @param colour Colour from enumeration
+ *
+ * @return esp_err_t ESP_OK on success
+ *
+ */
+static esp_err_t gled_strip_rmt_set_colour(gled_strip_t *strip, colour_t colour);
 
-static esp_err_t gled_strip_rmt_refresh(led_strip_t *strip)
+/**
+ * @brief Transmit no loop TX configuration to LED strip to refresh LED strip
+ * (ESP-IDF Remote Control)
+ *
+ * @param strip LED Strip handle
+ *
+ * @return esp_err_t ESP_OK on success
+ */
+static esp_err_t gled_strip_rmt_refresh(gled_strip_t *strip);
 
-static esp_err_t gled_strip_rmt_clear(led_strip_t *strip)
-
+/**
+ * @brief Clear all pixels to no colour & refreshes LED strip
+ * (ESP-IDF Remote Control)
+ *
+ * @param strip LED Strip handle
+ *
+ * @return esp_err_t ESP_OK on success
+ */
+static esp_err_t gled_strip_rmt_clear(gled_strip_t *strip);

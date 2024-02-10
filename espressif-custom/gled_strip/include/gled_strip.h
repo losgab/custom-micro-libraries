@@ -13,13 +13,16 @@
 #define CHANNELS 3
 
 /**
- * @brief LED Strip pixel format
+ * @brief LED Strip pixel format / LED Model
  */
 typedef enum
 {
     LED_PIXEL_FORMAT_GRB,
     LED_PIXEL_FORMAT_GRBW,
+    LED_PIXEL_FORMAT_INVALID
 } pixel_format_t;
+
+/***/
 
 /**
  * @brief LED Strip Data
@@ -30,7 +33,7 @@ typedef struct
     uint16_t max_leds;                  // Max number of LEDS attached on LED strip
     pixel_format_t format;              // Pixel format of the LED Strip
     gled_strip_rmt_config_t rmt_config; // RMT configuration
-    gled_strip_rmt_obj rmt_obj;          // RMT object
+    gled_strip_rmt_ctrl rmt_control;         // RMT object
 } gled_strip_t;
 
 /**
@@ -71,4 +74,3 @@ void gled_strip_refresh(gled_strip_t *strip);
  * @return void
  */
 void gled_strip_clear(gled_strip_t *strip);
-
