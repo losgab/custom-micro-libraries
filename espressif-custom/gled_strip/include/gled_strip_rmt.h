@@ -33,11 +33,11 @@ typedef struct
  */
 typedef struct
 {
-    rmt_encoder_handle_t strip_encoder; // RMT Encoder Handle
+    rmt_encoder_handle_t *strip_encoder; // RMT Encoder Handle
     uint32_t resolution;                // RMT Encoder resolution, in Hz
     uint8_t bytes_per_pixel;            // Bytes per pixel
     uint8_t pixel_buffer[];             // Pixel buffer to store pixel values
-} gled_strip_rmt_ctrl;
+} gled_strip_rmt_device;
 
 /**
  * @brief Initialize RMT device with encoder, pixel control and RMT transmission

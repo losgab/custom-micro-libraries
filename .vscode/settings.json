@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "gpio.h": "c"
+        "gpio.h": "c",
+        "gled_strip_colours.h": "c"
     }
 }

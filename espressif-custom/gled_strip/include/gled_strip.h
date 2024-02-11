@@ -1,8 +1,12 @@
-/*
-    Convenience Library for Addressable LED Strips & Colours
-
-    @author Gabriel Thien 2024
-*/
+/**
+ * Convenience Library for Addressable LED Strips & Colours
+ *
+ * - Defines interface functions for entire LED library
+ * - Defines initialisation function for LED strip that configures all functionality
+ *   including RMT device and RMT encoder.
+ *
+ *  @author Gabriel Thien 2024
+ */
 #pragma once
 
 #include "gled_strip_rmt.h"
@@ -22,22 +26,73 @@ typedef enum
     LED_PIXEL_FORMAT_INVALID
 } pixel_format_t;
 
-/***/
-
 /**
- * @brief LED Strip Data
+ * @brief Configuration struct
  */
 typedef struct
 {
-    gpio_num_t pin;                     // GPIO Pin used by the LED Strip
-    uint16_t max_leds;                  // Max number of LEDS attached on LED strip
-    pixel_format_t format;              // Pixel format of the LED Strip
-    gled_strip_rmt_config_t rmt_config; // RMT configuration
-    gled_strip_rmt_ctrl rmt_control;         // RMT object
-} gled_strip_t;
+    gpio_num_t pin;                      // GPIO Pin used by the LED Strip
+    uint16_t max_leds;                   // Max number of LEDS attached on LED strip
+    pixel_format_t format;               // Pixel format of the LED Strip
+    gled_strip_rmt_config_t *rmt_config; // RMT configuration
+    gled_strip_rmt_ctrl *rmt_control;    // RMT object
+} gled_config;
 
 /**
- * @brief Interface function for setting colour of the LED strip
+ * @brief LED Strip Object & Interface function definition
+ */
+typedef struct
+{
+    gpio_num_t pin;                  // GPIO Pin used by the LED Strip
+    uint16_t max_leds;               // Max number of LEDS attached on LED strip
+    pixel_format_t format;           // Pixel format of the LED Strip
+    gled_strip_rmt_device *rmt_device; // RMT Device
+
+    /**
+     * @brief Interface function for setting colour of entire strip
+     *
+     * @param strip LED strip handle
+     * @param index Index of the LED to set
+     * @param colour Colour from enumeration
+     *
+     * @return ESP_OK on success, otherwise an error code
+     */
+    esp_err_t (*set_pixel)(gled_strip_t *strip, uint16_t index, colour_t colour);
+
+    /**
+     * @brief Interface function for refreshing LED strip
+     *
+     * @param strip LED strip handle
+     *
+     * @return ESP_OK on success, otherwise an error code
+     */
+    esp_err_t (*refresh)(gled_strip_t *strip);
+
+    /**
+     * @brief Interface function for turning off LED strip
+     *
+     * @param strip LED strip handle
+     *
+     * @return ESP_OK on success, otherwise an error code
+     */
+    esp_err_t (*clear)(gled_strip_t *strip);
+
+    /**
+     * @brief Interface function for deleting LED strip & freeing memory
+     * 
+     * @param strip LED strip handle
+     * 
+     * @return ESP_OK on success, otherwise an error code
+    */
+    esp_err_t (*delete)(gled_strip_t *strip);
+} gled_strip_t;
+
+/////////////////////////////////////////////////////////////
+//////////////// USERLAND API FUNCTIONS /////////////////////
+/////////////////////////////////////////////////////////////
+
+/**
+ * @brief Sets colour of the entire LED strip
  *
  * @param strip LED strip handle
  * @param colour Colour from enumeration
