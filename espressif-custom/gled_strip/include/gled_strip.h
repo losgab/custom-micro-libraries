@@ -13,8 +13,7 @@
 #include "gled_strip_colours.h"
 #include <driver/gpio.h>
 
-#define MAX_COLOURS 6
-#define CHANNELS 3
+#define MAX_NUM_LEDS 50
 
 /**
  * @brief LED Strip pixel format / LED Model
@@ -26,27 +25,30 @@ typedef enum
     LED_PIXEL_FORMAT_INVALID
 } pixel_format_t;
 
-/**
- * @brief Configuration struct
- */
-typedef struct
-{
-    gpio_num_t pin;                      // GPIO Pin used by the LED Strip
-    uint16_t max_leds;                   // Max number of LEDS attached on LED strip
-    pixel_format_t format;               // Pixel format of the LED Strip
-    gled_strip_rmt_config_t *rmt_config; // RMT configuration
-    gled_strip_rmt_ctrl *rmt_control;    // RMT object
-} gled_config;
+// /**
+//  * @brief Configuration struct
+//  */
+// typedef struct
+// {
+//     gpio_num_t pin;                      // GPIO Pin used by the LED Strip
+//     uint16_t max_leds;                   // Max number of LEDS attached on LED strip
+//     pixel_format_t format;               // Pixel format of the LED Strip
+//     gled_strip_rmt_config_t *rmt_config; // RMT configuration
+// } gled_config;
 
 /**
  * @brief LED Strip Object & Interface function definition
  */
 typedef struct
 {
-    gpio_num_t pin;                  // GPIO Pin used by the LED Strip
-    uint16_t max_leds;               // Max number of LEDS attached on LED strip
-    pixel_format_t format;           // Pixel format of the LED Strip
+    gpio_num_t pin;                    // GPIO Pin used by the LED Strip
+    uint16_t max_leds;                 // Max number of LEDS attached on LED strip
+    pixel_format_t format;             // Pixel format of the LED Strip
     gled_strip_rmt_device *rmt_device; // RMT Device
+
+    /**
+     * Interface definitions are linked by RMT device initialisation
+    */
 
     /**
      * @brief Interface function for setting colour of entire strip
@@ -78,13 +80,13 @@ typedef struct
     esp_err_t (*clear)(gled_strip_t *strip);
 
     /**
-     * @brief Interface function for deleting LED strip & freeing memory
+     * @brief Interface function for deleting gled strip resources
      * 
      * @param strip LED strip handle
      * 
      * @return ESP_OK on success, otherwise an error code
     */
-    esp_err_t (*delete)(gled_strip_t *strip);
+   esp_err_t (*del)(gled_strip_t *strip);
 } gled_strip_t;
 
 /////////////////////////////////////////////////////////////
