@@ -1,6 +1,6 @@
 #include "gled_strip_rmt_encoder.h"
 
-static esp_err_t gled_new_strip_rmt_encoder(gled_strip_rmt_device *ret_device)
+static esp_err_t gled_strip_new_rmt_encoder(gled_strip_rmt_device *ret_device)
 {
     ESP_RETURN_ON_FALSE(ret_device == NULL, ESP_ERR_INVALID_ARG, RMT_ENCODER_TAG, "Encoder Not NULL");
 
@@ -28,7 +28,7 @@ static esp_err_t gled_new_strip_rmt_encoder(gled_strip_rmt_device *ret_device)
         .flags.msb_first = 1 // WS2812 transfer bit order: G7...G0R7...R0B7...B0
     };
     ESP_RETURN_ON_ERROR(rmt_new_bytes_encoder(&bytes_encoder_config, &new_encoder->bytes_encoder), RMT_ENCODER_TAG, "create bytes encoder failed");
-    rmt_copy_encoder_config_t copy_encoder_config = {};
+    rmt_copy_encoder_config_t copy_encoder_config;
     ESP_RETURN_ON_ERROR(rmt_new_copy_encoder(&copy_encoder_config, &new_encoder->copy_encoder), RMT_ENCODER_TAG, "create copy encoder failed");
 
     uint32_t reset_ticks = ret_device->rmt_config.resolution_hz / 1000000 * 50 / 2; // reset code duration defaults to 50us
@@ -43,51 +43,58 @@ static esp_err_t gled_new_strip_rmt_encoder(gled_strip_rmt_device *ret_device)
     return ESP_OK;
 }
 
-static size_t gled_strip_rmt_encoder_encode(gled_strip_rmt_encoder *encoder, rmt_channel_handle_t channel, const void *primary_data, size_t data_size, rmt_encode_state_t *ret_state)
+static size_t gled_strip_rmt_encoder_encode(gled_strip_rmt_encoder *strip_encoder, rmt_channel_handle_t channel, const void *primary_data, size_t data_size, rmt_encode_state_t *ret_state)
 {
-    rmt_encoder_handle_t bytes_encoder = encoder->bytes_encoder;
-    rmt_encoder_handle_t copy_encoder = encoder->copy_encoder;
+    rmt_encoder_handle_t bytes_encoder = strip_encoder->bytes_encoder;
+    rmt_encoder_handle_t copy_encoder = strip_encoder->copy_encoder;
     rmt_encode_state_t session_state = 0;
     rmt_encode_state_t state = 0;
     size_t encoded_symbols = 0;
-    switch (encoder->state)
+    switch (strip_encoder->state)
     {
     case 0: // send RGB data
         encoded_symbols += bytes_encoder->encode(bytes_encoder, channel, primary_data, data_size, &session_state);
         if (session_state & RMT_ENCODING_COMPLETE)
         {
-            encoder->state = 1; // switch to next state when current encoding session finished
+            strip_encoder->state = 1; // switch to next state when current encoding session finished
         }
         if (session_state & RMT_ENCODING_MEM_FULL)
         {
             state |= RMT_ENCODING_MEM_FULL;
-            goto out; // yield if there's no free space for encoding artifacts
+            ESP_LOGI(RMT_ENCODER_TAG, "No free space for encoding artifacts (case 0)");
+            break;
         }
-    // fall-through
     case 1: // send reset code
-        encoded_symbols += copy_encoder->encode(copy_encoder, channel, &encoder->reset_code,
-                                                sizeof(encoder->reset_code), &session_state);
+        encoded_symbols += copy_encoder->encode(copy_encoder, channel, &strip_encoder->reset_code,
+                                                sizeof(strip_encoder->reset_code), &session_state);
         if (session_state & RMT_ENCODING_COMPLETE)
         {
-            encoder->state = 0; // back to the initial encoding session
+            strip_encoder->state = 0; // back to the initial encoding session
             state |= RMT_ENCODING_COMPLETE;
         }
         if (session_state & RMT_ENCODING_MEM_FULL)
         {
             state |= RMT_ENCODING_MEM_FULL;
-            goto out; // yield if there's no free space for encoding artifacts
+            ESP_LOGI(RMT_ENCODER_TAG, "No free space for encoding artifacts (case 1)");
+            break;
         }
     }
-    encoder->state = state;
+    *ret_state = state;
     return ESP_OK;
 }
 
-static esp_err_t gled_strip_rmt_encoder_reset(gled_strip_rmt_encoder *encoder)
+static esp_err_t gled_strip_rmt_encoder_reset(gled_strip_rmt_encoder *strip_encoder)
 {
+    rmt_encoder_reset(strip_encoder->bytes_encoder);
+    rmt_encoder_reset(strip_encoder->copy_encoder);
+    strip_encoder->state = 0;
     return ESP_OK;
 }
 
-static esp_err_t gled_strip_rmt_encoder_del(gled_strip_rmt_encoder *encoder)
+static esp_err_t gled_strip_rmt_encoder_del(gled_strip_rmt_encoder *strip_encoder)
 {
+    rmt_del_encoder(strip_encoder->bytes_encoder);
+    rmt_del_encoder(strip_encoder->copy_encoder);
+    free(strip_encoder);
     return ESP_OK;
 }

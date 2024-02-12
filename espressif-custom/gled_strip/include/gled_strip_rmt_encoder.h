@@ -28,4 +28,4 @@ typedef struct
  *
  * @return ESP_OK on success, otherwise an error code
  */
-static esp_err_t gled_strip_new_rmt_encoder(rmt_encoder_handle_t *ret_encoder);
+static esp_err_t gled_strip_new_rmt_encoder(gled_strip_rmt_device *ret_device);

@@ -9,10 +9,13 @@
  */
 #pragma once
 
+#define MAX_NUM_LEDS 50
+
+#include "gled_strip_rmt.h"
 #include "gled_strip_colours.h"
 #include <driver/gpio.h>
 
-#define MAX_NUM_LEDS 50
+#define GLED_STRIP_TAG "GLED_STRIP"
 
 /**
  * @brief LED Strip pixel format / LED Model
@@ -25,77 +28,43 @@ typedef enum
 } pixel_format_t;
 
 // SUPPORTS ONLY LED_MODEL_WS2812
-//     uint16_t max_leds;                   // Max number of LEDS attached on LED strip
-//     pixel_format_t format;               // Pixel format of the LED Strip
-//     gled_strip_rmt_config_t *rmt_config; // RMT configuration
-// } gled_config;
 
 /**
  * @brief LED Strip Object & Interface function definition
  */
-typedef struct
+typedef struct gled_strip
 {
-    gpio_num_t pin;                    // GPIO Pin used by the LED Strip
-    uint16_t num_leds;                 // Max number of LEDS attached on LED strip
-    pixel_format_t format;             // Pixel format of the LED Strip
-    gled_strip_rmt_device *rmt_device; // RMT Device
-
-    /**
-     * Interface definitions are linked by RMT device initialisation
-     */
-
-    /**
-     * @brief Interface function for setting colour of entire strip
-     *
-     * @param strip LED strip handle
-     * @param index Index of the LED to set
-     * @param colour Colour from enumeration
-     *
-     * @return ESP_OK on success, otherwise an error code
-     */
-    esp_err_t (*set_pixel)(gled_strip_t *strip, uint16_t index, colour_t colour);
-
-    /**
-     * @brief Interface function for refreshing LED strip
-     *
-     * @param strip LED strip handle
-     *
-     * @return ESP_OK on success, otherwise an error code
-     */
-    esp_err_t (*refresh)(gled_strip_t *strip);
-
-    /**
-     * @brief Interface function for turning off LED strip
-     *
-     * @param strip LED strip handle
-     *
-     * @return ESP_OK on success, otherwise an error code
-     */
-    esp_err_t (*clear)(gled_strip_t *strip);
-
-    /**
-     * @brief Interface function for deleting gled strip resources
-     *
-     * @param strip LED strip handle
-     *
-     * @return ESP_OK on success, otherwise an error code
-     */
-    esp_err_t (*del)(gled_strip_t *strip);
+    gpio_num_t pin;                      // GPIO Pin used by the LED Strip
+    pixel_format_t format;               // Pixel format of the LED Strip
+    gled_strip_rmt_device *rmt_device;   // RMT Device Handle
+    gled_strip_rmt_interface *interface; // Interface
 } gled_strip_t;
+
 
 /////////////////////////////////////////////////////////////
 //////////////// USERLAND API FUNCTIONS /////////////////////
 /////////////////////////////////////////////////////////////
 
 /**
- * @brief Sets colour of the entire LED strip
+ * @brief Initialises LED Strip
+ *
+ * @param strip LED strip handle
+ * @param pin GPIO Pin used by the LED Strip
+ * @param num_leds Max number of LEDS attached on LED strip
+ *
+ * @return ESP_OK on success, otherwise an error code
+ */
+esp_err_t gled_strip_new(gled_strip_t *strip, gpio_num_t pin, uint16_t num_leds);
+
+/**
+ * @brief Sets colour of the entire LED strip. Also refreshes to immediately show colour.
  *
  * @param strip LED strip handle
  * @param colour Colour from enumeration
  *
- * @return void
+ * @return ESP_OK on success, otherwise an error code
  */
-void gled_strip_set_colour(gled_strip_t *strip, colour_t colour);
+esp_err_t gled_strip_set_colour(gled_strip_t *strip, colour_t colour);
 
 /**
  * @brief Interface function for setting colour of specified pixel of the LED strip
@@ -104,24 +73,24 @@ void gled_strip_set_colour(gled_strip_t *strip, colour_t colour);
  * @param pixel Pixel number
  * @param colour Colour from enumeration
  *
- * @return void
+ * @return ESP_OK on success, otherwise an error code
  */
-void gled_strip_set_pixel(gled_strip_t *strip, uint16_t pixel, colour_t colour);
+esp_err_t gled_strip_set_pixel(gled_strip_t *strip, uint16_t pixel, colour_t colour);
 
 /**
  * @brief Convenience function for refreshing LED strip
  *
  * @param strip LED strip handle
  *
- * @return void
+ * @return ESP_OK on success, otherwise an error code
  */
-void gled_strip_refresh(gled_strip_t *strip);
+esp_err_t gled_strip_refresh(gled_strip_t *strip);
 
 /**
  * @brief Convenience function for turning off LED strip
  *
  * @param strip LED strip handle
  *
- * @return void
+ * @return ESP_OK on success, otherwise an error code
  */
-void gled_strip_clear(gled_strip_t *strip);
+esp_err_t gled_strip_clear(gled_strip_t *strip);

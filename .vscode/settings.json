@@ -1,6 +1,11 @@
 {
     "files.associations": {
         "gpio.h": "c",
-        "gled_strip_colours.h": "c"
+        "gled_strip_colours.h": "c",
+        "*.tcc": "c",
+        "limits": "c",
+        "regex": "c",
+        "type_traits": "c",
+        "gled_strip.h": "c"
     }
 }

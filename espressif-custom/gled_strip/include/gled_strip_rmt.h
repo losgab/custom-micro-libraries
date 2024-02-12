@@ -42,6 +42,7 @@
 typedef struct
 {
     gled_strip_rmt_encoder *strip_encoder;  // RMT Strip Encoder Handle
+    uint16_t num_leds;                      // Max number of LEDS attached on LED strip
     uint8_t bytes_per_pixel;                // Bytes per pixel
     uint8_t pixel_buffer[3 * MAX_NUM_LEDS]; // Pixel buffer to store pixel values
     struct
@@ -56,6 +57,56 @@ typedef struct
 } gled_strip_rmt_device;
 
 /**
+ * @brief Function Interface for LED strip
+ */
+typedef struct
+{
+    /**
+     * Interface definitions are linked by RMT device initialisation
+     */
+
+    /**
+     * @brief Interface function for setting colour of entire strip
+     *
+     * @param strip LED strip handle
+     * @param index Index of the LED to set
+     * @param red   Red value of the LED
+     * @param green Green value of the LED
+     * @param blue  Blue value of the LED
+     *
+     * @return ESP_OK on success, otherwise an error code
+     */
+    esp_err_t (*set_pixel)(gled_strip_rmt_device *rmt_device, uint16_t index, uint8_t red, uint8_t green, uint8_t blue);
+
+    /**
+     * @brief Interface function for refreshing LED strip
+     *
+     * @param strip LED strip handle
+     *
+     * @return ESP_OK on success, otherwise an error code
+     */
+    esp_err_t (*refresh)(gled_strip_rmt_device *rmt_device);
+
+    /**
+     * @brief Interface function for turning off LED strip
+     *
+     * @param strip LED strip handle
+     *
+     * @return ESP_OK on success, otherwise an error code
+     */
+    esp_err_t (*clear)(gled_strip_rmt_device *rmt_device);
+
+    /**
+     * @brief Interface function for deleting gled strip resources
+     *
+     * @param strip LED strip handle
+     *
+     * @return ESP_OK on success, otherwise an error code
+     */
+    esp_err_t (*del)(gled_strip_rmt_device *rmt_device);
+} gled_strip_rmt_interface;
+
+/**
  * @brief Initialize RMT device with encoder, pixel control and RMT transmission
  * (ESP-IDF Remote Control)
  *
@@ -63,7 +114,16 @@ typedef struct
  *
  * @return esp_err_t ESP_OK on success
  */
-static esp_err_t gled_strip_new_rmt_device(gled_strip_t *strip);
+static esp_err_t gled_strip_new_rmt_device(gled_strip_rmt_device *rmt_device, gpio_num_t pin, uint16_t num_leds);
+
+/**
+ * @brief Initialise RMT interface
+ * 
+ * @param interface Interface handle
+ * 
+ * @return esp_err_t ESP_OK on success
+*/
+static esp_err_t gled_strip_new_rmt_interface(gled_strip_rmt_interface *interface);
 
 /**
  * @brief Set pixel colour of the LED strip. Does not refresh.
@@ -71,23 +131,13 @@ static esp_err_t gled_strip_new_rmt_device(gled_strip_t *strip);
  *
  * @param strip LED Strip handle
  * @param index Pixel index
- * @param colour Colour from enumeration
+ * @param red   Red value of the LED
+ * @param green Green value of the LED
+ * @param blue  Blue value of the LED
  *
  * @return esp_err_t ESP_OK on success
  */
-static esp_err_t gled_strip_rmt_set_pixel(gled_strip_t *strip, uint16_t index, colour_t colour);
-
-/**
- * @brief Sets colour of the entire LED strip. Refreshes immediately.
- * (ESP-IDF Remote Control)
- *
- * @param strip LED Strip handle
- * @param colour Colour from enumeration
- *
- * @return esp_err_t ESP_OK on success
- *
- */
-static esp_err_t gled_strip_rmt_set_colour(gled_strip_t *strip, colour_t colour);
+static esp_err_t gled_strip_rmt_set_pixel(gled_strip_rmt_device *rmt_device, uint16_t index, uint8_t red, uint8_t green, uint8_t blue);
 
 /**
  * @brief Transmit no loop TX configuration to LED strip to refresh LED strip
@@ -97,7 +147,7 @@ static esp_err_t gled_strip_rmt_set_colour(gled_strip_t *strip, colour_t colour)
  *
  * @return esp_err_t ESP_OK on success
  */
-static esp_err_t gled_strip_rmt_refresh(gled_strip_t *strip);
+static esp_err_t gled_strip_rmt_refresh(gled_strip_rmt_device *rmt_device);
 
 /**
  * @brief Clear all pixels to no colour & refreshes LED strip
@@ -107,4 +157,13 @@ static esp_err_t gled_strip_rmt_refresh(gled_strip_t *strip);
  *
  * @return esp_err_t ESP_OK on success
  */
-static esp_err_t gled_strip_rmt_clear(gled_strip_t *strip);
+static esp_err_t gled_strip_rmt_clear(gled_strip_rmt_device *rmt_device);
+
+/**
+ * @brief Delete RMT device
+ *
+ * @param strip LED Strip handle
+ *
+ * @return esp_err_t ESP_OK on success
+ */
+static esp_err_t gled_strip_rmt_del(gled_strip_rmt_device *rmt_device);
