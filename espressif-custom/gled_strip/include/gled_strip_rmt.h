@@ -11,9 +11,17 @@
 #include <stdint.h>
 
 #include "gled_strip.h"
+#include "gled_strip_rmt_encoder.h"
 
-#define LED_STRIP_RMT_DEFAULT_RESOLUTION 10000000 // 10MHz resolution
-#define LED_STRIP_RMT_DEFAULT_TRANS_QUEUE_SIZE 4
+#define GLED_STRIP_RMT_DEFAULT_RESOLUTION 10000000 // 10MHz resolution
+#define GLED_STRIP_RMT_DEFAULT_TRANS_QUEUE_SIZE 4
+
+#if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
+#define LED_STRIP_RMT_DEFAULT_MEM_BLOCK_SYMBOLS 64
+#else
+#define LED_STRIP_RMT_DEFAULT_MEM_BLOCK_SYMBOLS 48
+#endif
+
 #define RMT_DEVICE_TAG "RMT_DEVICE"
 
 // /**
@@ -33,10 +41,9 @@
  */
 typedef struct
 {
-    rmt_encoder_handle_t *strip_encoder; // RMT Encoder Handle
-    uint32_t encoder_resolution;                 // RMT Encoder resolution, in Hz
-    uint8_t bytes_per_pixel;             // Bytes per pixel
-    uint8_t pixel_buffer[3 * MAX_NUM_LEDS];  // Pixel buffer to store pixel values
+    gled_strip_rmt_encoder *strip_encoder;  // RMT Strip Encoder Handle
+    uint8_t bytes_per_pixel;                // Bytes per pixel
+    uint8_t pixel_buffer[3 * MAX_NUM_LEDS]; // Pixel buffer to store pixel values
     struct
     {
         rmt_channel_handle_t rmt_chan; // RMT Channel Handle
@@ -44,6 +51,7 @@ typedef struct
         uint32_t resolution_hz;        // RMT tick resolution, if set to zero, a default resolution (10MHz) will be applied
         size_t mem_block_symbols;      // How many RMT symbols can one RMT channel hold at one time. Set to 0 will fallback to use the default size.
         uint8_t with_dma;              // whether to enable the DMA feature
+        uint8_t invert_out;            // Invert output signal
     } rmt_config;
 } gled_strip_rmt_device;
 
