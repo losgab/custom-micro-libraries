@@ -19,7 +19,6 @@ void MovingAverage::enqueue(int item)
 		count++;
 	}
 	data[rear] = item;
-	// Serial.println(data[rear]);
 }
 
 float MovingAverage::calculateMovingAverage()
